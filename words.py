@@ -24,4 +24,3 @@ randNum = random.randint(1,101)
 if __name__ == '__main__':
 
     print("Computer took "+ str(computerGuess(6,100,randNum))+ " steps!")
-#print("Computer took "+ str(computerGuess(6,100,randNum))+ " steps!")
