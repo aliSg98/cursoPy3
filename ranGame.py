@@ -18,9 +18,9 @@ def computerGuess(lowval, highval, randNum, count =0):
 #generate random number between 1 and 101
 randNum = random.randint(1,101)
 
-#count = 0
-#guess = -99
+def main():
+    print("Computer took "+ str(computerGuess(6,100,randNum))+ " steps!")
 
 if __name__ == '__main__':
-
-    print("Computer took "+ str(computerGuess(6,100,randNum))+ " steps!")
+    main()
+    
