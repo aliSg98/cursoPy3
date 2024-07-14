@@ -1,4 +1,6 @@
 from exceptions import convert
 
-if __name__ == "__main__":
+def main():
     convert("two nine".split())
+if __name__ == "__main__":
+    main()

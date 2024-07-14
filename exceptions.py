@@ -20,6 +20,7 @@ def convert(s):
             number += DIGIT_MAP[token]
         x = int(number)
         print(f"Conversion succeeeded! x = {x}")
+        #raise TypeError
     except (KeyError, TypeError):
         print("Conversion failed!")
     return x
