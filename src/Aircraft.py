@@ -9,3 +9,6 @@ class Aircraft:
     def registration(self):
         return self._registration
     
+    def num_seats(self):
+        return self._num_seatss
+    
