@@ -2,6 +2,7 @@ from robocorp.tasks import task
 from robocorp import browser, vault
 from RPA.HTTP import HTTP
 from RPA.Tables import Tables
+import csv
 
 @task
 def order_robots_from_RobotSpareBin():
@@ -30,16 +31,20 @@ def get_orders():
     """Downloads csv file from the given URL"""
     http = HTTP()
     http.download(url="https://robotsparebinindustries.com/orders.csv", overwrite=True)
+    
+    path = "orders.csv"
     """Read csv"""
-    library = Tables()
-    orders_csv = library.read_table_from_csv(
-        "orders.csv", columns=["Order number", "Head", "Body", "Legs", "Address"]
-    )
-    orders = []
-    for order in orders_csv:
-        orders.append(order)
+    #library = Tables()
+    #orders_csv = library.read_table_from_csv(
+    #    "orders.csv", columns=["Order number", "Head", "Body", "Legs", "Address"]
+    #)
+    orders_list = []
+    with open(path, 'r') as csvfichero:
+                orders = csv.DictReader(csvfichero)                
+                for row in orders:
+                    orders_list.append(row)
 
-    return orders
+    return orders_list
 
 def close_annoying_modal():
     page = browser.page()
