@@ -2,7 +2,11 @@ from robocorp.tasks import task
 from robocorp import browser, vault
 from RPA.HTTP import HTTP
 from RPA.Tables import Tables
+from RPA.Browser.Selenium import Selenium
 import csv
+from selenium import webdriver
+from selenium.webdriver.support.ui import Select
+from selenium.webdriver.common.by import By
 
 @task
 def order_robots_from_RobotSpareBin():
@@ -31,15 +35,11 @@ def get_orders():
     """Downloads csv file from the given URL"""
     http = HTTP()
     http.download(url="https://robotsparebinindustries.com/orders.csv", overwrite=True)
-    
-    path = "orders.csv"
+
+    archivo = "orders.csv"
     """Read csv"""
-    #library = Tables()
-    #orders_csv = library.read_table_from_csv(
-    #    "orders.csv", columns=["Order number", "Head", "Body", "Legs", "Address"]
-    #)
     orders_list = []
-    with open(path, 'r') as csvfichero:
+    with open(archivo, 'r') as csvfichero:
                 orders = csv.DictReader(csvfichero)                
                 for row in orders:
                     orders_list.append(row)
@@ -53,13 +53,15 @@ def close_annoying_modal():
 
 def fill_the_form(orders):
     """Fills in the orders data and click the 'Submit' button"""
-    page = browser.page()
-    for order in orders:
-        return print(order["Address"])
-    
-    #page.fill("#ordernumber", str(orders["Order number"]))
-    #page.fill("#head", orders[1])
+    #page = browser.page()
+    browser = Selenium()
+    xpath = "//*[@id='head']"
+    head = browser.find_element(f'xpath:{xpath}')
+    browser.input_text
+    #head = page.find_element(By.XPATH,"//*[@id="head"]"))
+    #head.select_by_value(orders["Head"])
+    #page.fill("#head", orders["Head"])
     #page.fill("#body", orders[2])
     #page.fill("#legs", str(orders[3]))
-    page.fill("#address", orders["Address"])
-    page.click("text=Submit")
+    #page.fill("#address", orders["Address"])
+    #page.click("text=Submit")
