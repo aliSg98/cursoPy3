@@ -54,15 +54,17 @@ def close_annoying_modal():
 def fill_the_form(orders):
     """Fills in the orders data and click the 'Submit' button"""
     page = browser.page()
-    page.select_option("#head",orders[0]['Head'])
+    page.select_option("#head",orders[1]['Head'])
     botones = page.locator("input[type='radio']")
     
     for boton in botones.all():
+         """ver el valor del boton actual"""
          opcion = boton.evaluate("element => element.value")
-         if opcion == orders[0]["Body"]:
+         if opcion == orders[1]["Body"]:
               boton.click()
+              break
      
     
-    page.fill("xpath=//input[@placeholder='Enter the part number for the legs']", orders[0]['Legs'])
-    page.fill("#address", orders[0]["Address"])
+    page.fill("xpath=//input[@placeholder='Enter the part number for the legs']", orders[1]['Legs'])
+    page.fill("#address", orders[1]["Address"])
     page.click("text=order")
