@@ -13,25 +13,17 @@ def order_robots_from_RobotSpareBin():
     Creates ZIP archive of the receipts and the images.
     """
     browser.configure(
-        slowmo=10000,
+        slowmo=1000,
     )
     open_robot_order_website()
-    log_in()
-    get_orders()
-    #close_annoying_modal()
-    #fill_the_form()
+    orders = get_orders()
+    close_annoying_modal()
+    fill_the_form(orders)
 
 
 def open_robot_order_website():
     """Navigates to the given URL"""
-    browser.goto("https://robotsparebinindustries.com/")
-
-def log_in():
-    """Fills in the login form and clicks the 'Log in' button"""
-    page = browser.page()
-    page.fill("#username", "maria")
-    page.fill("#password", "thoushallnotpass")
-    page.click("button:text('Log in')")
+    browser.goto("https://robotsparebinindustries.com/#/robot-order")
 
 
 def get_orders():
@@ -49,15 +41,20 @@ def get_orders():
 
     return orders
 
-#def close_annoying_modal():
+def close_annoying_modal():
+    page = browser.page()
+    page.click("button:text('OK')")
+    
 
-def fill_and_submit_orders_form(orders):
+def fill_the_form(orders):
     """Fills in the orders data and click the 'Submit' button"""
     page = browser.page()
-
-    page.fill("#ordernumber", str(orders["Order number"]))
-    page.fill("#head", str(orders["Head"]))
-    page.select_option("#body", str(orders["Body"]))
-    page.fill("#legs", str(orders["Legs"]))
+    for order in orders:
+        return print(order["Address"])
+    
+    #page.fill("#ordernumber", str(orders["Order number"]))
+    #page.fill("#head", orders[1])
+    #page.fill("#body", orders[2])
+    #page.fill("#legs", str(orders[3]))
     page.fill("#address", orders["Address"])
     page.click("text=Submit")
