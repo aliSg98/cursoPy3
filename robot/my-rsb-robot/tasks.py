@@ -9,7 +9,7 @@ from RPA.PDF import PDF
 def robot_spare_bin_python():
     """Insert the sales data for the week and export it as a PDF"""    
     browser.configure(
-        slowmo=1000,
+        slowmo=100,
     )
     open_the_intranet_website()
     log_in()
