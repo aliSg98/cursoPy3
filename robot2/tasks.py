@@ -25,7 +25,8 @@ def order_robots_from_RobotSpareBin():
     orders = get_orders()
     close_annoying_modal()
     fill_the_form(orders)
-    store_receipt_as_pdf(orders[1])
+    store_receipt_as_pdf(orders[1]['Order number'])
+    screenshot_robot(orders[1]['Order number'])
 
 
 def open_robot_order_website():
@@ -42,9 +43,9 @@ def get_orders():
     """Read csv"""
     orders_list = []
     with open(archivo, 'r') as csvfichero:
-                orders = csv.DictReader(csvfichero)                
-                for row in orders:
-                    orders_list.append(row)
+            orders = csv.DictReader(csvfichero)                
+            for row in orders:
+                orders_list.append(row)
 
     return orders_list
 
@@ -95,12 +96,49 @@ def fill_the_form(orders):
     except Exception as exception:
          print(f"Error al completar el formulario{exception}")
 
+def fill_the_form2(orders):
+    try:
+        """orders es una lista de diccionarios"""
+        page = browser.page()
+        page.select_option("#head",orders[1]['Head'])
+        
+        """body"""
+        botones = page.locator("input[type='radio']")
+        for boton in botones.all():
+            """ver el valor del boton actual"""
+            opcion = boton.evaluate("element => element.value")
+            if opcion == orders[1]["Body"]:
+                  boton.click()
+                  break
+        
+        """Legs"""
+        page.fill("xpath=//input[@placeholder='Enter the part number for the legs']", orders[1]['Legs'])
+        """Address"""
+        page.fill("#address", orders[1]["Address"])
+        
+        #Si el try es correcto:
+        return page.click("text=order")
+    
+    except Exception as exception:
+         print(f"Error al completar el formulario{exception}")
+
+def screenshot_robot(order_number):
+    """Take a screenshot of the page"""
+    page = browser.page()
+    page.screenshot(path="output/orders_summary.png")
+
+def log_out():
+    """Presses the 'Log out' button"""
+    page = browser.page()  
+    page.click("text=Log out")
+
 def store_receipt_as_pdf(order_number):
     """Export the data to a pdf file"""
     page = browser.page()
-    results_html = page.locator("#root").inner_html()
+    results_html = page.locator("#model-info").inner_html()
     pdf = PDF()
-    pdf.html_to_pdf(results_html, "output/receipts/"+f"{order_number}.pdf")
+    #pdf.html_to_pdf(results_html, "output/receipts/"+f"Order-number:{order_number}.pdf")
+    pdf.html_to_pdf(results_html, "output/receipts/Order.pdf")
 
     
 
