@@ -19,14 +19,17 @@ def order_robots_from_RobotSpareBin():
     Creates ZIP archive of the receipts and the images.
     """
     browser.configure(
-        slowmo=1000,
+        slowmo=100,
     )
     open_robot_order_website()
     orders = get_orders()
     close_annoying_modal()
-    fill_the_form(orders)
-    store_receipt_as_pdf(orders[1]['Order number'])
-    screenshot_robot(orders[1]['Order number'])
+    for order in orders:
+        fill_the_form(order)
+        order_number = order['Order number']
+        break
+    store_receipt_as_pdf(order_number)
+    screenshot_robot(order_number)
 
 
 def open_robot_order_website():
@@ -54,7 +57,7 @@ def close_annoying_modal():
     page.click("button:text('OK')")
     
 
-def fill_the_form(orders):
+def fill_the_form2(orders):
     try:
         """orders es una lista de diccionarios"""
         page = browser.page()
@@ -96,31 +99,71 @@ def fill_the_form(orders):
     except Exception as exception:
          print(f"Error al completar el formulario{exception}")
 
-def fill_the_form2(orders):
-    try:
-        """orders es una lista de diccionarios"""
-        page = browser.page()
-        page.select_option("#head",orders[1]['Head'])
+def fill_the_form(orders):
+    #try:
+    """orders es una lista de diccionarios"""
+    page = browser.page()
+    page.select_option("#head",orders['Head'])
+    
+    """body"""
+    botones = page.locator("input[type='radio']")
+    for boton in botones.all():
+        """ver el valor del boton actual"""
+        opcion = boton.evaluate("element => element.value")
+        if opcion == orders["Body"]:
+              boton.click()
+              break
+    
+    """Legs"""
+    page.fill("xpath=//input[@placeholder='Enter the part number for the legs']", orders['Legs'])
+    """Address"""
+    page.fill("#address", orders["Address"])
+
+    page.click("text=order")
+    
+    return orders['Order number']
+    
+    #except Exception as exception:
+    #    print(f"Error al completar el formulario{exception}")
+
+def fill_the_form3(orders):    
+    """orders es una lista de diccionarios"""
+    page = browser.page()
+    for row in orders:
+        #page.select_option("#head",orders[1]['Head'])
+        for row in orders:
+            """head"""
+            page.select_option("#head",row['Head'])
+            break
         
         """body"""
         botones = page.locator("input[type='radio']")
         for boton in botones.all():
             """ver el valor del boton actual"""
             opcion = boton.evaluate("element => element.value")
-            if opcion == orders[1]["Body"]:
-                  boton.click()
-                  break
+            for row in orders:
+                if opcion == row["Body"]:
+                    boton.click()
+            break
+        
+        #for boton in botones.all():
+            """ver el valor del boton actual"""
+        #    opcion = boton.evaluate("element => element.value")
+        #     if opcion == orders[1]["Body"]:
+        #          boton.click()
+        #          break
         
         """Legs"""
-        page.fill("xpath=//input[@placeholder='Enter the part number for the legs']", orders[1]['Legs'])
+        for row in orders:
+            page.fill("xpath=//input[@placeholder='Enter the part number for the legs']", row['Legs'])
+            break
+        #page.fill("xpath=//input[@placeholder='Enter the part number for the legs']", orders[1]['Legs'])
         """Address"""
-        page.fill("#address", orders[1]["Address"])
-        
-        #Si el try es correcto:
-        return page.click("text=order")
-    
-    except Exception as exception:
-         print(f"Error al completar el formulario{exception}")
+        for row in orders:
+            page.fill("#address", row["Address"])
+            break
+
+        break
 
 def screenshot_robot(order_number):
     """Take a screenshot of the page"""
@@ -135,10 +178,10 @@ def log_out():
 def store_receipt_as_pdf(order_number):
     """Export the data to a pdf file"""
     page = browser.page()
-    results_html = page.locator("#model-info").inner_html()
+    results_html = page.locator("#robot-preview").inner_html()
     pdf = PDF()
-    #pdf.html_to_pdf(results_html, "output/receipts/"+f"Order-number:{order_number}.pdf")
-    pdf.html_to_pdf(results_html, "output/receipts/Order.pdf")
+    pdf.html_to_pdf(results_html, "output/receipts/"+f"Order-number:{order_number}.pdf")
+        
 
     
 
