@@ -5,3 +5,6 @@
 \ENV
 .env
 \env2
+
+#vscode
+.vscode

@@ -4,6 +4,7 @@ from RPA.HTTP import HTTP
 from RPA.Tables import Tables
 #from RPA.Browser.Selenium import Selenium
 import csv
+from RPA.PDF import PDF
 #from selenium import webdriver
 #from selenium.webdriver.support.ui import Select
 #from selenium.webdriver.common.by import By
@@ -24,6 +25,7 @@ def order_robots_from_RobotSpareBin():
     orders = get_orders()
     close_annoying_modal()
     fill_the_form(orders)
+    store_receipt_as_pdf(orders[1])
 
 
 def open_robot_order_website():
@@ -52,19 +54,54 @@ def close_annoying_modal():
     
 
 def fill_the_form(orders):
-    """Fills in the orders data and click the 'Submit' button"""
+    try:
+        """orders es una lista de diccionarios"""
+        page = browser.page()
+        #page.select_option("#head",orders[1]['Head'])
+        for row in orders:
+            """head"""
+            page.select_option("#head",row['Head'])
+            break
+        
+        """body"""
+        botones = page.locator("input[type='radio']")
+        for boton in botones.all():
+            """ver el valor del boton actual"""
+            opcion = boton.evaluate("element => element.value")
+            for row in orders:
+                if opcion == row["Body"]:
+                    boton.click()
+            break
+        
+        #for boton in botones.all():
+            """ver el valor del boton actual"""
+        #    opcion = boton.evaluate("element => element.value")
+        #     if opcion == orders[1]["Body"]:
+        #          boton.click()
+        #          break
+        
+        """Legs"""
+        for row in orders:
+            page.fill("xpath=//input[@placeholder='Enter the part number for the legs']", row['Legs'])
+            break
+        #page.fill("xpath=//input[@placeholder='Enter the part number for the legs']", orders[1]['Legs'])
+        """Address"""
+        for row in orders:
+            page.fill("#address", row["Address"])
+            break
+        #Si el try es correcto:
+        return page.click("text=order")
+    
+    except Exception as exception:
+         print(f"Error al completar el formulario{exception}")
+
+def store_receipt_as_pdf(order_number):
+    """Export the data to a pdf file"""
     page = browser.page()
-    page.select_option("#head",orders[1]['Head'])
-    botones = page.locator("input[type='radio']")
+    results_html = page.locator("#root").inner_html()
+    pdf = PDF()
+    pdf.html_to_pdf(results_html, "output/receipts/"+f"{order_number}.pdf")
+
     
-    for boton in botones.all():
-         """ver el valor del boton actual"""
-         opcion = boton.evaluate("element => element.value")
-         if opcion == orders[1]["Body"]:
-              boton.click()
-              break
-     
-    
-    page.fill("xpath=//input[@placeholder='Enter the part number for the legs']", orders[1]['Legs'])
-    page.fill("#address", orders[1]["Address"])
-    page.click("text=order")
+
+         
