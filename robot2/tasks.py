@@ -2,13 +2,9 @@ from robocorp.tasks import task
 from robocorp import browser, vault
 from RPA.HTTP import HTTP
 from RPA.Tables import Tables
-#from RPA.Browser.Selenium import Selenium
 import csv
 from RPA.PDF import PDF
-from PIL import Image
-#from selenium import webdriver
-#from selenium.webdriver.support.ui import Select
-#from selenium.webdriver.common.by import By
+from RPA.Archive import Archive
 
 @task
 def order_robots_from_RobotSpareBin():
@@ -20,7 +16,7 @@ def order_robots_from_RobotSpareBin():
     Creates ZIP archive of the receipts and the images.
     """
     browser.configure(
-        slowmo=100,
+        slowmo=1000,
     )
     open_robot_order_website()
     orders = get_orders()
@@ -34,6 +30,7 @@ def order_robots_from_RobotSpareBin():
     pdf_file = store_receipt_as_pdf(order_number)
     screenshot = screenshot_robot(order_number)
     embed_screenshot_to_receipt(screenshot, pdf_file)
+    archive_receipts()
 
 
 def open_robot_order_website():
@@ -169,7 +166,8 @@ def fill_the_form3(orders):
 def screenshot_robot(order_number):
     """Take a screenshot of the page"""
     page = browser.page()
-    screenshot = page.screenshot(path=f"output/orders{order_number}.png")
+    page.screenshot(path=f"output/receipts/orders{order_number}.png")
+    screenshot = f"output/receipts/orders{order_number}.png"
     return screenshot
 
 def log_out():
@@ -182,12 +180,35 @@ def store_receipt_as_pdf(order_number):
     page = browser.page()
     results_html = page.locator("#receipt").inner_html()
     pdf = PDF()
-    pdf_final = pdf.html_to_pdf(results_html, "output/receipts/"+f"Orders-{order_number}.pdf")
+    pdf.html_to_pdf(results_html, "output/receipts/"+f"Orders-{order_number}.pdf")
+    pdf_final = "output/receipts/"+f"Orders-{order_number}.pdf"
     return pdf_final
 
 def embed_screenshot_to_receipt(screenshot, pdf_file):
     pdf = PDF()
+    pdf.open_pdf(pdf_file)
+    pdf.add_watermark_image_to_pdf(
+        image_path = screenshot,
+        source_path = pdf_file,
+        output_path="output/receipts/Orders_embed.pdf"
+
+    )
+    pdf.close_all_pdfs()
+
+def archive_receipts():
+    archive = Archive()
+    path_archives = "output/receipts"
+    zip_name = "output/receipts/Orders.zip"
+    #if not os.path.exists(path_archives):
+    #files = [os.path.join(path_archives, file) for file in os.listdir(path_archives) if file.endswith(('.pdf', '.png', '.jpg'))]
+    #if not files:
+    #print(f"No hay archivos {path_archives}.")
+    #print(f"El directorio {path_archives} no existe.")
+    #else:
+    # Crear el archivo ZIP con los recibos PDF
+    archive.archive_folder_with_zip(zip_name, path_archives)
     
+
 
         
 
