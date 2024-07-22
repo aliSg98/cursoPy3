@@ -23,11 +23,11 @@ def order_robots_from_RobotSpareBin():
     )
     open_robot_order_website()
     orders = get_orders()
-    close_annoying_modal()
+    close_annoying_modal()    
     for order in orders:
         fill_the_form(order)
-        order_number = order['Order number']
         break
+    order_number = fill_the_form(orders)
     store_receipt_as_pdf(order_number)
     screenshot_robot(order_number)
 
@@ -55,7 +55,33 @@ def get_orders():
 def close_annoying_modal():
     page = browser.page()
     page.click("button:text('OK')")
+
+def fill_the_form(orders):
+    try:
+        """orders es una lista de diccionarios"""
+        page = browser.page()
+        page.select_option("#head",orders['Head'])
+        
+        """body"""
+        botones = page.locator("input[type='radio']")
+        for boton in botones.all():
+            """ver el valor del boton actual"""
+            opcion = boton.evaluate("element => element.value")
+            if opcion == orders["Body"]:
+                boton.click()
+                break
+        
+        """Legs"""
+        page.fill("xpath=//input[@placeholder='Enter the part number for the legs']", orders['Legs'])
+        """Address"""
+        page.fill("#address", orders["Address"])
+
+        page.click("text=order")
+        
+        return orders['Order number']
     
+    except Exception as exception:
+        print(f"Error al completar el formulario{exception}")
 
 def fill_the_form2(orders):
     try:
@@ -99,33 +125,6 @@ def fill_the_form2(orders):
     except Exception as exception:
          print(f"Error al completar el formulario{exception}")
 
-def fill_the_form(orders):
-    #try:
-    """orders es una lista de diccionarios"""
-    page = browser.page()
-    page.select_option("#head",orders['Head'])
-    
-    """body"""
-    botones = page.locator("input[type='radio']")
-    for boton in botones.all():
-        """ver el valor del boton actual"""
-        opcion = boton.evaluate("element => element.value")
-        if opcion == orders["Body"]:
-              boton.click()
-              break
-    
-    """Legs"""
-    page.fill("xpath=//input[@placeholder='Enter the part number for the legs']", orders['Legs'])
-    """Address"""
-    page.fill("#address", orders["Address"])
-
-    page.click("text=order")
-    
-    return orders['Order number']
-    
-    #except Exception as exception:
-    #    print(f"Error al completar el formulario{exception}")
-
 def fill_the_form3(orders):    
     """orders es una lista de diccionarios"""
     page = browser.page()
@@ -168,7 +167,7 @@ def fill_the_form3(orders):
 def screenshot_robot(order_number):
     """Take a screenshot of the page"""
     page = browser.page()
-    page.screenshot(path="output/orders_summary.png")
+    page.screenshot(path=f"output/orders{order_number}.png")
 
 def log_out():
     """Presses the 'Log out' button"""
@@ -180,7 +179,7 @@ def store_receipt_as_pdf(order_number):
     page = browser.page()
     results_html = page.locator("#robot-preview").inner_html()
     pdf = PDF()
-    pdf.html_to_pdf(results_html, "output/receipts/"+f"Order-number:{order_number}.pdf")
+    pdf.html_to_pdf(results_html, "output/receipts/"+f"Orders-{order_number}.pdf")
         
 
     
