@@ -198,7 +198,7 @@ def embed_screenshot_to_receipt(screenshot, pdf_file):
 def archive_receipts():
     archive = Archive()
     path_archives = "output/receipts"
-    zip_name = "output/receipts/Orders.zip"
+    zip_name = "output/receipts/orders.zip"
     #if not os.path.exists(path_archives):
     #files = [os.path.join(path_archives, file) for file in os.listdir(path_archives) if file.endswith(('.pdf', '.png', '.jpg'))]
     #if not files:
