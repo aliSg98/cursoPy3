@@ -29,10 +29,11 @@ def order_robots_from_RobotSpareBin():
         fill_the_form(order)
         order_number = order["Order number"]
         break
-    
+    store_receipt_as_pdf(order_number)
+    screenshot_robot(order_number)
     pdf_file = store_receipt_as_pdf(order_number)
     screenshot = screenshot_robot(order_number)
-    #embed_screenshot_to_receipt(screenshot, pdf_file)
+    embed_screenshot_to_receipt(screenshot, pdf_file)
 
 
 def open_robot_order_website():
@@ -186,26 +187,6 @@ def store_receipt_as_pdf(order_number):
 
 def embed_screenshot_to_receipt(screenshot, pdf_file):
     pdf = PDF()
-    pdf.open_pdf(pdf_file)
-    page_count = pdf.get_number_of_pages()
-    position = (10, 10)
-    
-    # Agregar una nueva página para la captura de pantalla
-    pdf.add_page()
-    page_width, page_height = pdf.get_page_size(page_count + 1)
-    
-    # Redimensionar la imagen para que se ajuste a la página
-    image = Image.open(screenshot)
-    image.thumbnail((page_width, page_height), Image.ANTIALIAS)
-    resized_image_path = "output/resized_screenshot.png"
-    image.save(resized_image_path)
-    
-    # Insertar la captura de pantalla en la última página
-    pdf.add_image(resized_image_path, page_count + 1, position)
-    
-    # Guardar el PDF con la captura de pantalla insertada
-    pdf.save_pdf(pdf_file)
-    pdf.close_pdf()
     
 
         
