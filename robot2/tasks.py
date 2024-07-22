@@ -5,6 +5,7 @@ from RPA.Tables import Tables
 #from RPA.Browser.Selenium import Selenium
 import csv
 from RPA.PDF import PDF
+from PIL import Image
 #from selenium import webdriver
 #from selenium.webdriver.support.ui import Select
 #from selenium.webdriver.common.by import By
@@ -26,10 +27,12 @@ def order_robots_from_RobotSpareBin():
     close_annoying_modal()    
     for order in orders:
         fill_the_form(order)
+        order_number = order["Order number"]
         break
-    order_number = fill_the_form(orders)
-    store_receipt_as_pdf(order_number)
-    screenshot_robot(order_number)
+    
+    pdf_file = store_receipt_as_pdf(order_number)
+    screenshot = screenshot_robot(order_number)
+    #embed_screenshot_to_receipt(screenshot, pdf_file)
 
 
 def open_robot_order_website():
@@ -76,9 +79,7 @@ def fill_the_form(orders):
         """Address"""
         page.fill("#address", orders["Address"])
 
-        page.click("text=order")
-        
-        return orders['Order number']
+        return page.click('//*[@id="order" and @type="submit"]')
     
     except Exception as exception:
         print(f"Error al completar el formulario{exception}")
@@ -167,7 +168,8 @@ def fill_the_form3(orders):
 def screenshot_robot(order_number):
     """Take a screenshot of the page"""
     page = browser.page()
-    page.screenshot(path=f"output/orders{order_number}.png")
+    screenshot = page.screenshot(path=f"output/orders{order_number}.png")
+    return screenshot
 
 def log_out():
     """Presses the 'Log out' button"""
@@ -177,9 +179,35 @@ def log_out():
 def store_receipt_as_pdf(order_number):
     """Export the data to a pdf file"""
     page = browser.page()
-    results_html = page.locator("#robot-preview").inner_html()
+    results_html = page.locator("#receipt").inner_html()
     pdf = PDF()
-    pdf.html_to_pdf(results_html, "output/receipts/"+f"Orders-{order_number}.pdf")
+    pdf_final = pdf.html_to_pdf(results_html, "output/receipts/"+f"Orders-{order_number}.pdf")
+    return pdf_final
+
+def embed_screenshot_to_receipt(screenshot, pdf_file):
+    pdf = PDF()
+    pdf.open_pdf(pdf_file)
+    page_count = pdf.get_number_of_pages()
+    position = (10, 10)
+    
+    # Agregar una nueva página para la captura de pantalla
+    pdf.add_page()
+    page_width, page_height = pdf.get_page_size(page_count + 1)
+    
+    # Redimensionar la imagen para que se ajuste a la página
+    image = Image.open(screenshot)
+    image.thumbnail((page_width, page_height), Image.ANTIALIAS)
+    resized_image_path = "output/resized_screenshot.png"
+    image.save(resized_image_path)
+    
+    # Insertar la captura de pantalla en la última página
+    pdf.add_image(resized_image_path, page_count + 1, position)
+    
+    # Guardar el PDF con la captura de pantalla insertada
+    pdf.save_pdf(pdf_file)
+    pdf.close_pdf()
+    
+
         
 
     
