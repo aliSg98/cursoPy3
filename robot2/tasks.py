@@ -5,6 +5,7 @@ from RPA.Tables import Tables
 import csv
 from RPA.PDF import PDF
 from RPA.Archive import Archive
+import sys
 
 @task
 def order_robots_from_RobotSpareBin():
@@ -197,8 +198,8 @@ def embed_screenshot_to_receipt(screenshot, pdf_file):
 
 def archive_receipts():
     archive = Archive()
-    path_archives = "output/receipts"
-    zip_name = "output/receipts/orders.zip"
+    path_archives = 'C:/Users/nasudre/Desktop/Transactics/Cursos/python/Core Python 3 Getting Started/Repo git/cursoPy3/robot2/output/receipts'
+    #zip_name = 'C:\Users\nasudre\Desktop\Transactics\Cursos\python\Core Python 3 Getting Started\Repo git\cursoPy3\robot2\output\receipts\orders.zip'
     #if not os.path.exists(path_archives):
     #files = [os.path.join(path_archives, file) for file in os.listdir(path_archives) if file.endswith(('.pdf', '.png', '.jpg'))]
     #if not files:
@@ -206,7 +207,7 @@ def archive_receipts():
     #print(f"El directorio {path_archives} no existe.")
     #else:
     # Crear el archivo ZIP con los recibos PDF
-    archive.archive_folder_with_zip(zip_name, path_archives)
+    archive.archive_folder_with_zip(path_archives, 'orders.zip')
     
 
 
