@@ -5,7 +5,7 @@ from RPA.Tables import Tables
 #from RPA.Browser.Selenium import Selenium
 import csv
 from RPA.PDF import PDF
-from PIL import Image
+from RPA.Archive import Archive
 #from selenium import webdriver
 #from selenium.webdriver.support.ui import Select
 #from selenium.webdriver.common.by import By
